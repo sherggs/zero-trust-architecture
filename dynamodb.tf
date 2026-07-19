@@ -1,4 +1,4 @@
-resource "aws_dynamodb_table" "zt-table" {
+resource "aws_dynamodb_table" "zero_trust_table" {
   name         = "${var.project_name}-dynamodb-table"
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "item_id"
