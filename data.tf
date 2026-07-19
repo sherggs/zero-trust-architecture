@@ -52,3 +52,32 @@ data "archive_file" "lambda_zip" {
   source_dir  = "${path.module}/lambda"
   output_path = "${path.module}/build/read_inventory.zip"
 }
+
+data "aws_iam_policy_document" "lambda_permissions" {
+  statement {
+    sid = "DynamoReadOnly"
+    actions = [
+      "dynamodb:GetItem",
+      "dynamodb:BatchGetItem",
+      "dynamodb:Query",
+      "dynamodb:Scan",
+    ]
+    resources = [
+      aws_dynamodb_table.zero_trust_table.arn,
+      "${aws_dynamodb_table.zero_trust_table.arn}/index/*",
+    ]
+  }
+
+  statement {
+    sid = "Logs"
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+    ]
+    resources = [
+      "arn:aws:logs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${var.project_name}-read-inventory*"
+    ]
+  }
+}
+
