@@ -81,3 +81,37 @@ data "aws_iam_policy_document" "lambda_permissions" {
   }
 }
 
+# Deny-by-default resource policy. The Deny statement rejects any principal whose ARN differs from the client role. a
+data "aws_iam_policy_document" "api_resource_policy" {
+  statement {
+    sid    = "AllowClientRole"
+    effect = "Allow"
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.client.arn]
+    }
+
+    actions   = ["execute-api:Invoke"]
+    resources = ["${aws_api_gateway_rest_api.inventory.execution_arn}/*/GET/*"]
+  }
+
+  statement {
+    sid    = "DenyEveryoneElse"
+    effect = "Deny"
+
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+
+    actions   = ["execute-api:Invoke"]
+    resources = ["${aws_api_gateway_rest_api.inventory.execution_arn}/*"]
+
+    condition {
+      test     = "StringNotEquals"
+      variable = "aws:PrincipalArn"
+      values   = [aws_iam_role.client.arn]
+    }
+  }
+}
