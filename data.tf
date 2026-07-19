@@ -11,7 +11,7 @@ data "aws_iam_policy_document" "client_invoke" {
 #AMI for only aws owned linux image
 data "aws_ami" "al2023" {
   # If you want to match multiple AMIs, use the aws_ami_ids data source instead.
-  most_recent = true // use an ami id for this I am using most recent = true as a prefernce
+  most_recent = true # use an ami id for this I am using most recent = true as a prefernce
   owners      = ["amazon"]
 
   filter {
@@ -36,3 +36,19 @@ data "aws_iam_policy_document" "ec2_assume" {
   }
 }
 
+data "aws_iam_policy_document" "lambda_assume" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+  }
+}
+
+data "archive_file" "lambda_zip" {
+  type        = "zip"
+  source_dir  = "${path.module}/lambda"
+  output_path = "${path.module}/build/read_inventory.zip"
+}
