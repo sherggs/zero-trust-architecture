@@ -4,6 +4,7 @@ resource "aws_security_group" "client" {
   description = "No ingress. HTTPS egress only."
   vpc_id      = aws_vpc.zero_trust.id
 
+  #tfsec:ignore:aws-ec2-no-public-egress-sgr
   egress {
     description = "HTTPS out for SSM, package repos, API Gateway"
     from_port   = 443
@@ -52,6 +53,9 @@ resource "aws_instance" "client" {
     http_tokens                 = "required"
     http_endpoint               = "enabled"
     http_put_response_hop_limit = 1
+  }
+  root_block_device {
+    encrypted = true
   }
 
   # awscurl signs requests with SigV4 using the instance role credentials, so you test the IAM-auth path with one command.
