@@ -84,10 +84,6 @@ Do not use the DynamoDB lock table. The lockfile method removes one resource, it
 
 The bucket is not in the Terraform configuration because a backend cannot manage the bucket for its own state.
 
-## Seed data through the data plane, and cursor pagination
-
-The configuration has no `aws_dynamodb_table_item` resources, so the Terraform state contains infrastructure only. The script `scripts/seed.sh` writes the rows with `batch-write-item` after apply. Row data in a state file is a data leak into the control plane, and it also connects the data lifecycle to `terraform destroy`.
-
 ## Ideas for a production system
 
 - Add VPC interface endpoints for SSM and execute-api. Then the traffic does not go through the internet gateway.
