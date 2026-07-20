@@ -10,7 +10,7 @@ resource "aws_vpc" "zero_trust" {
   }
 }
 
-resource "aws_internet_gateway" "zero_trust_igw" {
+resource "aws_internet_gateway" "zero_trust" {
   vpc_id = aws_vpc.zero_trust.id
 
   tags = {
@@ -33,7 +33,7 @@ resource "aws_route_table" "public" {
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.zero_trust_igw.id
+    gateway_id = aws_internet_gateway.zero_trust.id
   }
 
   tags = {
