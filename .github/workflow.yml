@@ -1,0 +1,42 @@
+# Validate-only workflow.
+name: Terraform Validate
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Format, validate, scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ">= 1.10.0"
+
+      - name: Check formatting
+        run: terraform fmt -check -recursive
+
+      # -backend=false initialises providers WITHOUT contacting S3.
+      - name: Initialise (no backend)
+        run: terraform init -backend=false
+
+      # validate checks syntax and internal consistency
+      - name: Validate
+        run: terraform validate
+
+      # Static security scan.
+      - name: Security scan (tfsec)
+        uses: aquasecurity/tfsec-action@v1.0.3
+        with:
+          soft_fail: true
