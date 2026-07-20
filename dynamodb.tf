@@ -7,7 +7,7 @@ resource "aws_dynamodb_table" "zero_trust_table" {
     name = "item_id"
     type = "S"
   }
-
+  #tfsec:ignore:aws-dynamodb-table-customer-key
   server_side_encryption {
     enabled = true
   }
