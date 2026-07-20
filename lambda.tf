@@ -21,6 +21,10 @@ resource "aws_lambda_function" "read_inventory" {
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
   timeout          = 10
 
+  tracing_config {
+    mode = "Active"
+  }
+
   environment {
     variables = {
       TABLE_NAME = aws_dynamodb_table.zero_trust_table.name
