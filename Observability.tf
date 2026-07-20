@@ -2,15 +2,16 @@
 # Every rejected request against the API returns a 4XX and API Gateway counts them in the 4XXError metric
 # A spike means someone is probing the endpoint or a legitimate client lost its permissions. Either way you want to know within minutes
 
+#tfsec:ignore:aws-sns-topic-encryption-use-cmk
 resource "aws_sns_topic" "alerts" {
-  name = "${var.project_name}-alerts"
+  name              = "${var.project_name}-alerts"
+  kms_master_key_id = "alias/aws/sns"
 }
 
 # Subscription only exists when an email is supplied.
 # SNS email subscriptions need manual confirmation, so Terraform creates the subscription and AWS emails you a confirmation link.
 resource "aws_sns_topic_subscription" "email" {
-  count = var.alarm_email == "" ? 0 : 1
-
+  count     = var.alarm_email == "" ? 0 : 1
   topic_arn = aws_sns_topic.alerts.arn
   protocol  = "email"
   endpoint  = var.alarm_email
